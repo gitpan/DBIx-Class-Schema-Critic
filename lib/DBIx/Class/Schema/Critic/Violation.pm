@@ -4,24 +4,25 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.004';    # VERSION
+our $VERSION = '0.005';    # VERSION
 use Const::Fast;
 use Moose;
 use DBIx::Class::Schema::Critic::Types 'DBICType';
-use overload q{""} => \&stringify;
+use overload q{""} => sub { shift->as_string };
 
 const my @TEXT_FIELDS => qw(description explanation details);
 has \@TEXT_FIELDS => ( is => 'ro', isa => 'Str', default => q{} );
 
 has element => ( is => 'ro', isa => DBICType );
+has as_string => ( is => 'ro', isa => 'Str', lazy_build => 1 );
 
-sub stringify {
+sub _build_as_string {     ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self    = shift;
     my $element = $self->element;
     my $type    = ref $element;
 
     $type =~ s/\A .* :://xms;
-    my %TYPE_MAP = (
+    const my %TYPE_MAP => (
         Table     => $element->from,
         ResultSet => $element->result_class,
         Schema    => 'schema',
@@ -50,7 +51,7 @@ DBIx::Class::Schema::Critic::Violation - A violation of a DBIx::Class::Schema::C
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -94,9 +95,7 @@ L<DBIx::Class::Schema::Critic::Policy|DBIx::Class::Schema::Critic::Policy>,
 as an instance of L<DBICType|DBIx::Class::Schema::Critic::Types/DBICType>.
 Only settable at construction.
 
-=head1 METHODS
-
-=head2 stringify
+=head2 as_string
 
 Returns a string representation of the object.  The same method is called if
 the object appears in double quotes.
