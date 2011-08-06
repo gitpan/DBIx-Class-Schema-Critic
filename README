@@ -3,11 +3,13 @@ NAME
     practices
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
         use DBIx::Class::Schema::Critic;
-        my $critic = DBIx::Class::Schema::Critic->new();
+
+        my $critic = DBIx::Class::Schema::Critic->new(
+            dsn => 'dbi:Oracle:HR', username => 'scott', password => 'tiger');
         $critic->critique();
 
 DESCRIPTION

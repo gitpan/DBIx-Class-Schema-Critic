@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.010';    # VERSION
+our $VERSION = '0.011';    # VERSION
 use Carp;
 use List::MoreUtils 'any';
 use Module::Pluggable
@@ -125,12 +125,14 @@ DBIx::Class::Schema::Critic - Critique a database schema for best practices
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
     use DBIx::Class::Schema::Critic;
-    my $critic = DBIx::Class::Schema::Critic->new();
+
+    my $critic = DBIx::Class::Schema::Critic->new(
+        dsn => 'dbi:Oracle:HR', username => 'scott', password => 'tiger');
     $critic->critique();
 
 =head1 DESCRIPTION
