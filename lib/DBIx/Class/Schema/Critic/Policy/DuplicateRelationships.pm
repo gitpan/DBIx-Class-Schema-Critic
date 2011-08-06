@@ -1,16 +1,41 @@
-package DBIx::Class::Schema::Critic::Loader;
+package DBIx::Class::Schema::Critic::Policy::DuplicateRelationships;
 
 use strict;
 use utf8;
 use Modern::Perl;
 
 our $VERSION = '0.012';    # VERSION
+use Algorithm::Combinatorics 'combinations';
+use Data::Compare;
 use Moo;
-extends 'DBIx::Class::Schema::Loader';
-__PACKAGE__->loader_options( naming => 'v4', generate_pod => 0 );
+use namespace::autoclean -also => qr{\A _}xms;
+
+my %ATTR = (
+    description => 'Duplicate relationships',
+    explanation =>
+        'Each connection between tables should only be expressed once.',
+);
+
+while ( my ( $name, $default ) = each %ATTR ) {
+    has $name => ( is => 'ro', default => sub {$default} );
+}
+
+has applies_to => ( is => 'ro', default => sub { ['ResultSource'] } );
+
+sub violates {
+    my $source = shift->element;
+    return if $source->relationships < 2;
+
+    return join "\n" => map { sprintf '%s and %s are duplicates', @{$_} }
+        grep {
+        Compare( map { $source->relationship_info($_) } @{$_} )
+        } combinations( [ $source->relationships ], 2 );
+}
+
+with 'DBIx::Class::Schema::Critic::Policy';
 1;
 
-# ABSTRACT: Loader class for schemas generated from a database connection
+# ABSTRACT: Check for ResultSources with unnecessary duplicate relationships
 
 __END__
 
@@ -23,7 +48,7 @@ kwalitee diff irc mailto metadata placeholders
 
 =head1 NAME
 
-DBIx::Class::Schema::Critic::Loader - Loader class for schemas generated from a database connection
+DBIx::Class::Schema::Critic::Policy::DuplicateRelationships - Check for ResultSources with unnecessary duplicate relationships
 
 =head1 VERSION
 
@@ -31,15 +56,39 @@ version 0.012
 
 =head1 SYNOPSIS
 
-    use DBIx::Class::Schema::Critic::Loader;
-    my $schema = DBIx::Class::Schema::Critic::Loader->connect('dbi:sqlite:foo');
+    use DBIx::Class::Schema::Critic;
+
+    my $critic = DBIx::Class::Schema::Critic->new(
+        dsn => 'dbi:Oracle:HR', username => 'scott', password => 'tiger');
+    $critic->critique();
 
 =head1 DESCRIPTION
 
-This is a simple subclass of
-L<DBIx::Class::Schema::Loader|DBIx::Class::Schema::Loader> used by
-L<DBIx::Class::Schema::Critic|DBIx::Class::Schema::Critic> to dynamically
-generate a schema based on a database connection.
+This policy returns a violation if a
+L<DBIx::Class::ResultSource|DBIx::Class::ResultSource> has relationships to
+other tables that are identical in everything but name.
+
+=head1 ATTRIBUTES
+
+=head2 description
+
+"Duplicate relationships"
+
+=head2 explanation
+
+"Each connection between tables should only be expressed once."
+
+=head2 applies_to
+
+This policy applies to L<ResultSource|DBIx::Class::ResultSource>s.
+
+=head1 METHODS
+
+=head2 violates
+
+Returns details if the
+L<"current element"|DBIx::Class::Schema::Critic::Policy>'s C<relationship_info>
+hashes for any defined relationships are duplicated.
 
 =head1 SUPPORT
 

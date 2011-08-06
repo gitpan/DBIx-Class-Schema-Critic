@@ -26,11 +26,12 @@ meta-spec:
   version: 1.4
 name: DBIx-Class-Schema-Critic
 requires:
+  Algorithm::Combinatorics: 0
   Carp: 0
   Const::Fast: 0
   DBI: 0
-  DBIx::Class: 0.08125
-  DBIx::Class::Schema::Loader: 0
+  DBIx::Class::Schema::Loader: 0.07007
+  Data::Compare: 0
   Getopt::Long::Descriptive: 0
   List::MoreUtils: 0
   Modern::Perl: 0
@@ -46,4 +47,4 @@ resources:
   bugtracker: https://github.com/mjgardner/DBIx-Class-Schema-Critic/issues
   homepage: http://metacpan.org/release/DBIx-Class-Schema-Critic/
   repository: git://github.com/mjgardner/DBIx-Class-Schema-Critic.git
-version: 0.011
+version: 0.012
