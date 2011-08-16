@@ -4,21 +4,20 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 use Moo;
+use Sub::Quote;
 use namespace::autoclean -also => qr{\A _}xms;
 
-my %ATTR = (
-    description => 'Missing bidirectional relationship',
-    explanation =>
-        'Related tables should have relationships defined in both classes.',
+has description => (
+    is      => 'ro',
+    default => quote_sub q{'Missing bidirectional relationship'},
 );
-
-while ( my ( $name, $default ) = each %ATTR ) {
-    has $name => ( is => 'ro', default => sub {$default} );
-}
-
-has applies_to => ( is => 'ro', default => sub { ['ResultSource'] } );
+has explanation => (
+    is      => 'ro',
+    default => quote_sub
+        q{'Related tables should have relationships defined in both classes.'},
+);
 
 sub violates {
     my $source = shift->element;
@@ -31,7 +30,7 @@ sub violates {
 
 sub _message { return "$_[0] to $_[1] not reciprocated" }
 
-with 'DBIx::Class::Schema::Critic::Policy';
+with 'DBIx::Class::Schema::Critic::PolicyType::ResultSource';
 1;
 
 # ABSTRACT: Check for missing bidirectional relationships in ResultSources
@@ -51,7 +50,7 @@ DBIx::Class::Schema::Critic::Policy::BidirectionalRelationship - Check for missi
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

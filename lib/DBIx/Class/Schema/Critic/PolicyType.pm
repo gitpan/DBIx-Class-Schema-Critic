@@ -1,40 +1,31 @@
-package DBIx::Class::Schema::Critic::Policy::DuplicateRelationships;
+package DBIx::Class::Schema::Critic::PolicyType;
 
 use strict;
 use utf8;
 use Modern::Perl;
 
 our $VERSION = '0.013';    # VERSION
-use Algorithm::Combinatorics 'combinations';
-use Data::Compare;
-use Moo;
+require Devel::Symdump;
+use List::MoreUtils;
+use Moo::Role;
 use Sub::Quote;
 use namespace::autoclean -also => qr{\A _}xms;
+with 'DBIx::Class::Schema::Critic::Policy';
 
-has description => (
-    is      => 'ro',
-    default => quote_sub q{'Duplicate relationships'},
+has applies_to => (
+    is   => 'ro',
+    lazy => 1,
+    ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+    default => quote_sub( <<'END_SUB' => { '$package' => \__PACKAGE__ } ),
+        [   List::MoreUtils::apply {s/\A .+ :://xms}
+            grep { shift->does($_) } Devel::Symdump->packages($package),
+        ];
+END_SUB
 );
-has explanation => (
-    is      => 'ro',
-    default => quote_sub
-        q{'Each connection between tables should only be expressed once.'},
-);
 
-sub violates {
-    my $source = shift->element;
-    return if $source->relationships < 2;
-
-    return join "\n" => map { sprintf '%s and %s are duplicates', @{$_} }
-        grep {
-        Compare( map { $source->relationship_info($_) } @{$_} )
-        } combinations( [ $source->relationships ], 2 );
-}
-
-with 'DBIx::Class::Schema::Critic::PolicyType::ResultSource';
 1;
 
-# ABSTRACT: Check for ResultSources with unnecessary duplicate relationships
+# ABSTRACT: Role for types of database criticism policies
 
 __END__
 
@@ -47,7 +38,7 @@ kwalitee diff irc mailto metadata placeholders
 
 =head1 NAME
 
-DBIx::Class::Schema::Critic::Policy::DuplicateRelationships - Check for ResultSources with unnecessary duplicate relationships
+DBIx::Class::Schema::Critic::PolicyType - Role for types of database criticism policies
 
 =head1 VERSION
 
@@ -55,39 +46,23 @@ version 0.013
 
 =head1 SYNOPSIS
 
-    use DBIx::Class::Schema::Critic;
-
-    my $critic = DBIx::Class::Schema::Critic->new(
-        dsn => 'dbi:Oracle:HR', username => 'scott', password => 'tiger');
-    $critic->critique();
+    package DBIx::Class::Schema::Critic::PolicyType::ResultClass;
+    use Moo;
+    with 'DBIx::Class::Schema::Critic::PolicyType';
+    1;
 
 =head1 DESCRIPTION
 
-This policy returns a violation if a
-L<DBIx::Class::ResultSource|DBIx::Class::ResultSource> has relationships to
-other tables that are identical in everything but name.
+This is a L<role|Moo::Role> consumed by all
+L<DBIx::Class::Schema::Critic|DBIx::Class::Schema::Critic> policy types.
 
 =head1 ATTRIBUTES
 
-=head2 description
-
-"Duplicate relationships"
-
-=head2 explanation
-
-"Each connection between tables should only be expressed once."
-
 =head2 applies_to
 
-This policy applies to L<ResultSource|DBIx::Class::ResultSource>s.
-
-=head1 METHODS
-
-=head2 violates
-
-Returns details if the
-L<"current element"|DBIx::Class::Schema::Critic::Policy>'s C<relationship_info>
-hashes for any defined relationships are duplicated.
+Returns an array reference containing the last component of all the
+L<DBIx::Class::Schema::Critic::PolicyType|DBIx::Class::Schema::Critic::PolicyType>
+roles composed into the consuming class.
 
 =head1 SUPPORT
 

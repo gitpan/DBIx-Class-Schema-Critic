@@ -40,8 +40,10 @@ my %WriteMakefileArgs = (
     'Carp' => '0',
     'Const::Fast' => '0',
     'DBI' => '0',
+    'DBIx::Class' => '0.08125',
     'DBIx::Class::Schema::Loader' => '0.07007',
     'Data::Compare' => '0',
+    'Devel::Symdump' => '0',
     'Getopt::Long::Descriptive' => '0',
     'List::MoreUtils' => '0',
     'Modern::Perl' => '0',
@@ -49,11 +51,12 @@ my %WriteMakefileArgs = (
     'Moo' => '0',
     'Moo::Role' => '0',
     'Scalar::Util' => '0',
+    'Sub::Quote' => '0',
     'namespace::autoclean' => '0',
     'overload' => '0',
     'utf8' => '0'
   },
-  'VERSION' => '0.012',
+  'VERSION' => '0.013',
   'test' => {
     'TESTS' => 't/*.t t/policy/*.t'
   }

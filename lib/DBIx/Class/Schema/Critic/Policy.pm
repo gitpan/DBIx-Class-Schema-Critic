@@ -4,12 +4,12 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 use Moo::Role;
 use DBIx::Class::Schema::Critic::Violation;
 use namespace::autoclean -also => qr{\A _}xms;
 
-requires qw(description explanation applies_to violates);
+requires qw(description explanation violates);
 
 around violates => sub {
     my ( $orig, $self ) = splice @_, 0, 2;
@@ -53,7 +53,7 @@ DBIx::Class::Schema::Critic::Policy - Role for criticizing database schemas
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

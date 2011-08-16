@@ -4,21 +4,17 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 use Moo;
+use Sub::Quote;
 use namespace::autoclean -also => qr{\A _}xms;
 
-my %ATTR = (
-    description => 'No primary key',
-    explanation =>
-        'Tables should have one or more columns defined as a primary key.',
+has description => ( is => 'ro', default => quote_sub q{'No primary key'} );
+has explanation => (
+    is      => 'ro',
+    default => quote_sub
+        q{'Tables should have one or more columns defined as a primary key.'},
 );
-
-while ( my ( $name, $default ) = each %ATTR ) {
-    has $name => ( is => 'ro', default => sub {$default} );
-}
-
-has applies_to => ( is => 'ro', default => sub { ['ResultSource'] } );
 
 sub violates {
     my $source = shift->element;
@@ -26,7 +22,7 @@ sub violates {
     return;
 }
 
-with 'DBIx::Class::Schema::Critic::Policy';
+with 'DBIx::Class::Schema::Critic::PolicyType::ResultSource';
 1;
 
 # ABSTRACT: Check for DBIx::Class::Schema::ResultSources without primary keys
@@ -46,7 +42,7 @@ DBIx::Class::Schema::Critic::Policy::NoPrimaryKey - Check for DBIx::Class::Schem
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

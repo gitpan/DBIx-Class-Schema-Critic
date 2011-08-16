@@ -4,22 +4,21 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 use DBI ':sql_types';
 use Moo;
+use Sub::Quote;
 use namespace::autoclean -also => qr{\A _}xms;
 
-my %ATTR = (
-    description => 'Nullable text column',
-    explanation =>
-        'Text columns should not be nullable. Default to empty string instead.',
+has description => (
+    is      => 'ro',
+    default => quote_sub q{'Nullable text column'},
 );
-
-while ( my ( $name, $default ) = each %ATTR ) {
-    has $name => ( is => 'ro', default => sub {$default} );
-}
-
-has applies_to => ( is => 'ro', default => sub { ['ResultSource'] } );
+has explanation => (
+    is      => 'ro',
+    default => quote_sub
+        q{'Text columns should not be nullable. Default to empty string instead.'},
+);
 
 sub violates {
     my $source = shift->element;
@@ -43,7 +42,7 @@ sub violates {
     } keys %column;
 }
 
-with 'DBIx::Class::Schema::Critic::Policy';
+with 'DBIx::Class::Schema::Critic::PolicyType::ResultSource';
 1;
 
 # ABSTRACT: Check for ResultSources with nullable text columns
@@ -63,7 +62,7 @@ DBIx::Class::Schema::Critic::Policy::NullableTextColumn - Check for ResultSource
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

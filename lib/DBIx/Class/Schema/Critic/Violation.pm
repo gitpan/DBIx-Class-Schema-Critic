@@ -4,14 +4,15 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 use Const::Fast;
 use Moo;
+use Sub::Quote;
 use overload q{""} => sub { shift->as_string };
 
 const my @TEXT_FIELDS => qw(description explanation details);
 for (@TEXT_FIELDS) {
-    has $_ => ( is => 'ro', default => sub {q{}} );
+    has $_ => ( is => 'ro', default => quote_sub q{q{}} );
 }
 
 has element => ( is => 'ro' );
@@ -51,7 +52,7 @@ DBIx::Class::Schema::Critic::Violation - A violation of a DBIx::Class::Schema::C
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
