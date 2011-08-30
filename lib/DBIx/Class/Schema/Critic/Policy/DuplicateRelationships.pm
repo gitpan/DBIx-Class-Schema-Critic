@@ -4,9 +4,10 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.014';    # VERSION
 use Algorithm::Combinatorics 'combinations';
 use Data::Compare;
+use English '-no_match_vars';
 use Moo;
 use Sub::Quote;
 use namespace::autoclean -also => qr{\A _}xms;
@@ -25,9 +26,9 @@ sub violates {
     my $source = shift->element;
     return if $source->relationships < 2;
 
-    return join "\n" => map { sprintf '%s and %s are duplicates', @{$_} }
+    return join "\n" => map { sprintf '%s and %s are duplicates', @{$ARG} }
         grep {
-        Compare( map { $source->relationship_info($_) } @{$_} )
+        Compare( map { $source->relationship_info($ARG) } @{$ARG} )
         } combinations( [ $source->relationships ], 2 );
 }
 
@@ -51,7 +52,7 @@ DBIx::Class::Schema::Critic::Policy::DuplicateRelationships - Check for ResultSo
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

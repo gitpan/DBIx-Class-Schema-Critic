@@ -4,8 +4,9 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.014';    # VERSION
 use Const::Fast;
+use English '-no_match_vars';
 use Moo;
 use Sub::Quote;
 use overload q{""} => sub { shift->as_string };
@@ -30,7 +31,7 @@ sub _build_as_string {
         Schema    => 'schema',
     );
     return "[$type $TYPE_MAP{$type}] " . join "\n",
-        map { $self->$_ } @TEXT_FIELDS;
+        map { $self->$ARG } @TEXT_FIELDS;
 }
 
 1;
@@ -52,7 +53,7 @@ DBIx::Class::Schema::Critic::Violation - A violation of a DBIx::Class::Schema::C
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

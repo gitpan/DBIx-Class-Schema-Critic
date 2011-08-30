@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.014';    # VERSION
 require Devel::Symdump;
 use List::MoreUtils;
 use Moo::Role;
@@ -42,7 +42,7 @@ DBIx::Class::Schema::Critic::PolicyType - Role for types of database criticism p
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ L<DBIx::Class::Schema::Critic|DBIx::Class::Schema::Critic> policy types.
 =head2 applies_to
 
 Returns an array reference containing the last component of all the
-L<DBIx::Class::Schema::Critic::PolicyType|DBIx::Class::Schema::Critic::PolicyType>
+C<DBIx::Class::Schema::Critic::PolicyType>
 roles composed into the consuming class.
 
 =head1 SUPPORT
